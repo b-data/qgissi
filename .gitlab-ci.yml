@@ -33,7 +33,9 @@ build:version-linux-amd64:
       -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-amd64
       -t $CI_APP_REPO/latest/$IMAGE-linux-amd64
       -f build.Dockerfile .
-    - docker push $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-amd64
+    - |
+      docker push $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-amd64
+      docker push $CI_APP_REPO/latest/$IMAGE-linux-amd64
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
 
@@ -50,7 +52,9 @@ build:version-linux-arm64v8:
       -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
       -t $CI_APP_REPO/latest/$IMAGE-linux-arm64v8
       -f build.Dockerfile .
-    - docker push $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
+    - |
+      docker push $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
+      docker push $CI_APP_REPO/latest/$IMAGE-linux-arm64v8
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
 
