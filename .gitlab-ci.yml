@@ -65,6 +65,7 @@ build-manifest:version-linux-multiarch:
     - |
       for i in $OS_ARCH; do
         export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO/$QGIS_VERSION/$IMAGE-$i"
+        export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO/latest/$IMAGE-$i"
       done
     - |
       docker manifest create $CI_APP_REPO/$QGIS_VERSION/$IMAGE $CI_MANIFEST_LIST
