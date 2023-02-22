@@ -1,7 +1,7 @@
 ARG IMAGE
 ARG PREFIX=/usr/local
 
-FROM registry.gitlab.b-data.ch/nodejs/nsi/18.14.0/debian:bullseye as nsi
+FROM registry.gitlab.b-data.ch/nodejs/nsi/18.14.1/debian:bullseye as nsi
 
 FROM ${IMAGE} as builder
 
