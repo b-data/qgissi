@@ -20,7 +20,7 @@
   before_script:
     - *before-script-build
 
-build:version-linux-amd64:
+build:latest-linux-amd64:
   extends: .build
   tags:
     - arch:amd64
@@ -31,15 +31,15 @@ build:version-linux-amd64:
       --build-arg IMAGE
       --build-arg QGIS_VERSION
       -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-amd64
-      -t $CI_APP_REPO/latest-ltr/$IMAGE-linux-amd64
+      -t $CI_APP_REPO/latest/$IMAGE-linux-amd64
       -f build.Dockerfile .
     - |
       docker push $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-amd64
-      docker push $CI_APP_REPO/latest-ltr/$IMAGE-linux-amd64
+      docker push $CI_APP_REPO/latest/$IMAGE-linux-amd64
   rules:
-    - if: $CI_COMMIT_BRANCH == "ltr" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
 
-build:version-linux-arm64v8:
+build:latest-linux-arm64v8:
   extends: .build
   tags:
     - arch:arm64/v8
@@ -50,22 +50,60 @@ build:version-linux-arm64v8:
       --build-arg IMAGE
       --build-arg QGIS_VERSION
       -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
-      -t $CI_APP_REPO/latest-ltr/$IMAGE-linux-arm64v8
+      -t $CI_APP_REPO/latest/$IMAGE-linux-arm64v8
       -f build.Dockerfile .
     - |
       docker push $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
-      docker push $CI_APP_REPO/latest-ltr/$IMAGE-linux-arm64v8
+      docker push $CI_APP_REPO/latest/$IMAGE-linux-arm64v8
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+
+build:ltr-linux-amd64:
+  extends: .build
+  tags:
+    - arch:amd64
+    - os:linux
+  script:
+    - >
+      docker build
+      --build-arg IMAGE
+      --build-arg QGIS_VERSION
+      -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-amd64
+      -t $CI_APP_REPO/ltr/$IMAGE-linux-amd64
+      -f build.Dockerfile .
+    - |
+      docker push $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-amd64
+      docker push $CI_APP_REPO/ltr/$IMAGE-linux-amd64
+  rules:
+    - if: $CI_COMMIT_BRANCH == "ltr" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+
+build:ltr-linux-arm64v8:
+  extends: .build
+  tags:
+    - arch:arm64/v8
+    - os:linux
+  script:
+    - >
+      docker build
+      --build-arg IMAGE
+      --build-arg QGIS_VERSION
+      -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
+      -t $CI_APP_REPO/ltr/$IMAGE-linux-arm64v8
+      -f build.Dockerfile .
+    - |
+      docker push $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
+      docker push $CI_APP_REPO/ltr/$IMAGE-linux-arm64v8
   rules:
     - if: $CI_COMMIT_BRANCH == "ltr" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
 
-build-manifest:version-linux-multiarch:
+build-manifest:latest-linux-multiarch:
   extends: .build
-  needs: ["build:version-linux-amd64", "build:version-linux-arm64v8"]
+  needs: ["build:latest-linux-amd64", "build:latest-linux-arm64v8"]
   script:
     - |
       for i in $OS_ARCH; do
         export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO/$QGIS_VERSION/$IMAGE-$i"
-        export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO/latest-ltr/$IMAGE-$i"
+        export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO/latest/$IMAGE-$i"
       done
     - |
       docker manifest create $CI_APP_REPO/$QGIS_VERSION/$IMAGE $CI_MANIFEST_LIST
@@ -75,12 +113,12 @@ build-manifest:version-linux-multiarch:
       fi
       docker manifest push $CI_APP_REPO/$QGIS_VERSION/$IMAGE
 
-      docker manifest create $CI_APP_REPO/latest-ltr/$IMAGE $CI_MANIFEST_LIST
+      docker manifest create $CI_APP_REPO/latest/$IMAGE $CI_MANIFEST_LIST
       if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
-        docker manifest annotate --variant v8 $CI_APP_REPO/latest-ltr/$IMAGE \
-          $CI_APP_REPO/latest-ltr/$IMAGE-linux-arm64v8
+        docker manifest annotate --variant v8 $CI_APP_REPO/latest/$IMAGE \
+          $CI_APP_REPO/latest/$IMAGE-linux-arm64v8
       fi
-      docker manifest push $CI_APP_REPO/latest-ltr/$IMAGE
+      docker manifest push $CI_APP_REPO/latest/$IMAGE
     - |
       if [[ ! -z "$ADD_IMAGES" ]]; then
         for i in $ADD_IMAGES; do
@@ -91,12 +129,56 @@ build-manifest:version-linux-multiarch:
           fi
           docker manifest push $CI_APP_REPO/$QGIS_VERSION/$i
 
-          docker manifest create $CI_APP_REPO/latest-ltr/$i $CI_MANIFEST_LIST
+          docker manifest create $CI_APP_REPO/latest/$i $CI_MANIFEST_LIST
           if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
-            docker manifest annotate --variant v8 $CI_APP_REPO/latest-ltr/$i \
-              $CI_APP_REPO/latest-ltr/$IMAGE-linux-arm64v8
+            docker manifest annotate --variant v8 $CI_APP_REPO/latest/$i \
+              $CI_APP_REPO/latest/$IMAGE-linux-arm64v8
           fi
-          docker manifest push $CI_APP_REPO/latest-ltr/$i
+          docker manifest push $CI_APP_REPO/latest/$i
+        done
+      fi
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_TRIGGERED
+
+build-manifest:ltr-linux-multiarch:
+  extends: .build
+  needs: ["build:ltr-linux-amd64", "build:ltr-linux-arm64v8"]
+  script:
+    - |
+      for i in $OS_ARCH; do
+        export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO/$QGIS_VERSION/$IMAGE-$i"
+        export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO/ltr/$IMAGE-$i"
+      done
+    - |
+      docker manifest create $CI_APP_REPO/$QGIS_VERSION/$IMAGE $CI_MANIFEST_LIST
+      if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
+        docker manifest annotate --variant v8 $CI_APP_REPO/$QGIS_VERSION/$IMAGE \
+          $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
+      fi
+      docker manifest push $CI_APP_REPO/$QGIS_VERSION/$IMAGE
+
+      docker manifest create $CI_APP_REPO/ltr/$IMAGE $CI_MANIFEST_LIST
+      if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
+        docker manifest annotate --variant v8 $CI_APP_REPO/ltr/$IMAGE \
+          $CI_APP_REPO/ltr/$IMAGE-linux-arm64v8
+      fi
+      docker manifest push $CI_APP_REPO/ltr/$IMAGE
+    - |
+      if [[ ! -z "$ADD_IMAGES" ]]; then
+        for i in $ADD_IMAGES; do
+          docker manifest create $CI_APP_REPO/$QGIS_VERSION/$i $CI_MANIFEST_LIST
+          if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
+            docker manifest annotate --variant v8 $CI_APP_REPO/$QGIS_VERSION/$i \
+              $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
+          fi
+          docker manifest push $CI_APP_REPO/$QGIS_VERSION/$i
+
+          docker manifest create $CI_APP_REPO/ltr/$i $CI_MANIFEST_LIST
+          if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
+            docker manifest annotate --variant v8 $CI_APP_REPO/ltr/$i \
+              $CI_APP_REPO/ltr/$IMAGE-linux-arm64v8
+          fi
+          docker manifest push $CI_APP_REPO/ltr/$i
         done
       fi
   rules:
