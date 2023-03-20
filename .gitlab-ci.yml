@@ -10,7 +10,7 @@
     --password-stdin $CI_REGISTRY
 
 .build:
-  image: registry.gitlab.b-data.ch/docker/docker-buildx:latest
+  image: glcr.b-data.ch/docker/docker-buildx:latest
   stage: build
   services:
     - docker:dind
