@@ -1,7 +1,7 @@
 ARG IMAGE
 ARG PREFIX=/usr/local
 
-FROM glcr.b-data.ch/nodejs/nsi/18.16.0/debian:bullseye as nsi
+FROM glcr.b-data.ch/nodejs/nsi/18.16.1/debian:11 as nsi
 
 FROM ${IMAGE} as builder
 
@@ -211,14 +211,14 @@ RUN if [ "$PREFIX" = "/usr/local" ]; then \
 ## Remove outdated SAGA GIS provider
 RUN rm -rf "${PREFIX}/share/qgis/python/plugins/sagaprovider"
 
-FROM scratch
+# FROM scratch
 
-LABEL org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.source="https://gitlab.b-data.ch/qgis/ggissi" \
-      org.opencontainers.image.vendor="b-data GmbH" \
-      org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
+# LABEL org.opencontainers.image.licenses="MIT" \
+#       org.opencontainers.image.source="https://gitlab.b-data.ch/qgis/ggissi" \
+#       org.opencontainers.image.vendor="b-data GmbH" \
+#       org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
 
-ARG PREFIX
+# ARG PREFIX
 
-COPY --from=builder ${PREFIX} ${PREFIX}
-COPY --from=builder /usr/lib/python3/dist-packages/qgis /usr/lib/python3/dist-packages/qgis
+# COPY --from=builder ${PREFIX} ${PREFIX}
+# COPY --from=builder /usr/lib/python3/dist-packages/qgis /usr/lib/python3/dist-packages/qgis
