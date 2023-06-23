@@ -25,6 +25,7 @@ ARG WITH_DESKTOP=ON
 ARG WITH_EPT=TRUE
 ARG WITH_GRASS7=ON
 ARG WITH_GRASS8=ON
+ARG WITH_GRASS_PLUGIN=TRUE
 ARG WITH_GSL=TRUE
 ARG WITH_GUI=TRUE
 ARG WITH_HANA=FALSE
@@ -211,14 +212,14 @@ RUN if [ "$PREFIX" = "/usr/local" ]; then \
 ## Remove outdated SAGA GIS provider
 RUN rm -rf "${PREFIX}/share/qgis/python/plugins/sagaprovider"
 
-# FROM scratch
+FROM scratch
 
-# LABEL org.opencontainers.image.licenses="MIT" \
-#       org.opencontainers.image.source="https://gitlab.b-data.ch/qgis/ggissi" \
-#       org.opencontainers.image.vendor="b-data GmbH" \
-#       org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
+LABEL org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.source="https://gitlab.b-data.ch/qgis/ggissi" \
+      org.opencontainers.image.vendor="b-data GmbH" \
+      org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
 
-# ARG PREFIX
+ARG PREFIX
 
-# COPY --from=builder ${PREFIX} ${PREFIX}
-# COPY --from=builder /usr/lib/python3/dist-packages/qgis /usr/lib/python3/dist-packages/qgis
+COPY --from=builder ${PREFIX} ${PREFIX}
+COPY --from=builder /usr/lib/python3/dist-packages/qgis /usr/lib/python3/dist-packages/qgis
