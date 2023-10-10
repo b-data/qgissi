@@ -1,7 +1,7 @@
 ARG IMAGE
 ARG PREFIX=/usr/local
 
-FROM glcr.b-data.ch/nodejs/nsi/18.17.1/debian:11 as nsi
+FROM glcr.b-data.ch/nodejs/nsi/18.18.0/debian:11 as nsi
 
 FROM ${IMAGE} as builder
 
@@ -22,6 +22,7 @@ ARG WITH_CORE=TRUE
 ARG WITH_CRASH_HANDLER=TRUE
 ARG WITH_CUSTOM_WIDGETS=ON
 ARG WITH_DESKTOP=ON
+ARG WITH_DRACO=TRUE
 ARG WITH_EPT=TRUE
 ARG WITH_GRASS7=ON
 ARG WITH_GRASS8=ON
@@ -81,6 +82,7 @@ RUN apt-get update \
     git \
     graphviz \
     grass-dev \
+    libdraco-dev \
     libexiv2-dev \
     libexpat1-dev \
     libfcgi-dev \
@@ -163,22 +165,22 @@ RUN apt-get update \
 
 ## Install build dependencies (codename-dependent)
 RUN . /etc/os-release \
-  && if $(echo $VERSION_CODENAME | grep -Eq "buster|bullseye|focal|jammy"); then \
+  && if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|focal|jammy"; then \
     apt-get -y install \
       libpdal-dev \
       pdal; \
   fi \
-  && if $(echo $VERSION_CODENAME | grep -Eq "buster|bullseye|focal"); then \
+  && if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|focal"; then \
     apt-get -y install \
       python3-sip-dev \
       qt5keychain-dev; \
   fi \
-  && if $(echo $VERSION_CODENAME | grep -Eq "buster|focal"); then \
+  && if echo "$VERSION_CODENAME" | grep -Eq "buster|focal"; then \
     apt-get -y install \
       qt5-default; \
     git -C /var/tmp clone --depth 1 https://github.com/qgis/QGIS; \
   fi \
-  && if $(echo $VERSION_CODENAME | grep -Eq "bookworm|sid|jammy|kinetic|lunar"); then \
+  && if echo "$VERSION_CODENAME" | grep -Eq "bookworm|sid|jammy|kinetic|lunar"; then \
     apt-get -y install \
       python3-pyqtbuild \
       qtkeychain-qt5-dev \
