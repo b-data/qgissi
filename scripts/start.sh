@@ -105,6 +105,22 @@ if [[ "$MODE" == "install" ]]; then
     cp -a /usr/lib/python3/dist-packages/qgis \
       /tmp/usr/lib/python3/dist-packages
   fi
+
+  # Install QGIS server landingpage
+  if [[ -d /var/cache/qgis-build/output/data/resources/server/api/ogc/static/landingpage ]]; then
+    if [[ ! -d "$PREFIX/share/qgis/resources/server/api/ogc/static/landingpage" ]]; then
+      mkdir -p "$PREFIX/share/qgis/resources/server/api/ogc/static"
+      cp -a /var/cache/qgis-build/output/data/resources/server/api/ogc/static/landingpage \
+        "$PREFIX/share/qgis/resources/server/api/ogc/static"
+    fi
+  fi
 else
   ninja "$MODE"
+
+  # Remove QGIS server landingpage
+  if [[ "$MODE" == "uninstall" ]]; then
+    if [[ -d "$PREFIX/share/qgis/resources/server/api/ogc/static/landingpage" ]]; then
+      rm -rf "$PREFIX/share/qgis/resources/server/api/ogc/static/landingpage"
+    fi
+  fi
 fi
