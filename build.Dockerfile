@@ -22,6 +22,7 @@ ARG WITH_CORE=TRUE
 ARG WITH_CRASH_HANDLER=TRUE
 ARG WITH_CUSTOM_WIDGETS=ON
 ARG WITH_DESKTOP=ON
+ARG WITH_DRACO=TRUE
 ARG WITH_EPT=TRUE
 ARG WITH_GRASS7=ON
 ARG WITH_GRASS8=ON
@@ -81,6 +82,7 @@ RUN apt-get update \
     git \
     graphviz \
     grass-dev \
+    libdraco-dev \
     libexiv2-dev \
     libexpat1-dev \
     libfcgi-dev \
