@@ -1,7 +1,7 @@
 ARG IMAGE
 ARG PREFIX=/usr/local
 
-FROM glcr.b-data.ch/nodejs/nsi/18.19.0/debian:11 as nsi
+FROM glcr.b-data.ch/nodejs/nsi/18.19.1/debian:11 as nsi
 
 FROM ${IMAGE} as builder
 
@@ -22,6 +22,7 @@ ARG WITH_CORE=TRUE
 ARG WITH_CRASH_HANDLER=TRUE
 ARG WITH_CUSTOM_WIDGETS=ON
 ARG WITH_DESKTOP=ON
+ARG WITH_DRACO=TRUE
 ARG WITH_EPT=TRUE
 ARG WITH_GRASS7=ON
 ARG WITH_GRASS8=ON
@@ -36,13 +37,17 @@ ARG WITH_INTERNAL_POLY2TRI=TRUE
 ARG WITH_OAUTH2_PLUGIN=TRUE
 ARG WITH_ORACLE=FALSE
 ARG WITH_PDAL=FALSE
+ARG WITH_PDF4QT=FALSE
 ARG WITH_POSTGRESQL=TRUE
 ARG WITH_PY_COMPILE=FALSE
 ARG WITH_QGIS_PROCESS=TRUE
 ARG WITH_QSCIAPI=TRUE
 ARG WITH_QSPATIALITE=ON
+ARG WITH_QTGAMEPAD=FALSE
+ARG WITH_QTPRINTER=TRUE
 ARG WITH_QT5SERIALPORT=TRUE
 ARG WITH_QTSERIALPORT=TRUE
+ARG WITH_QTWEBENGINE=FALSE
 ARG WITH_QTWEBKIT=TRUE
 ARG WITH_QUICK=FALSE
 ARG WITH_QWTPOLAR=FALSE
@@ -81,6 +86,7 @@ RUN apt-get update \
     git \
     graphviz \
     grass-dev \
+    libdraco-dev \
     libexiv2-dev \
     libexpat1-dev \
     libfcgi-dev \
@@ -139,6 +145,7 @@ RUN apt-get update \
     python3-pyqt5.qtsql \
     python3-pyqt5.qtsvg \
     python3-pyqt5.qtwebkit \
+    python3-pyqt5.qtserialport \
     python3-sip \
     python3-termcolor \
     python3-yaml \

@@ -53,6 +53,7 @@ cmake \
   -DWITH_CRASH_HANDLER="$WITH_CRASH_HANDLER" \
   -DWITH_CUSTOM_WIDGETS="$WITH_CUSTOM_WIDGETS" \
   -DWITH_DESKTOP="$WITH_DESKTOP" \
+  -DWITH_DRACO="$WITH_DRACO" \
   -DWITH_EPT="$WITH_EPT" \
   -DWITH_GRASS7="$WITH_GRASS7" \
   -DWITH_GRASS8="$WITH_GRASS8" \
@@ -67,13 +68,17 @@ cmake \
   -DWITH_OAUTH2_PLUGIN="$WITH_OAUTH2_PLUGIN" \
   -DWITH_ORACLE="$WITH_ORACLE" \
   -DWITH_PDAL="$WITH_PDAL" \
+  -DWITH_PDF4QT="$WITH_PDF4QT" \
   -DWITH_POSTGRESQL="$WITH_POSTGRESQL" \
   -DWITH_PY_COMPILE="$WITH_PY_COMPILE" \
   -DWITH_QGIS_PROCESS="$WITH_QGIS_PROCESS" \
   -DWITH_QSCIAPI="$WITH_QSCIAPI" \
   -DWITH_QSPATIALITE="$WITH_QSPATIALITE" \
+  -DWITH_QTGAMEPAD="$DWITH_QTGAMEPAD" \
+  -DWITH_QTPRINTER="$WITH_QTPRINTER" \
   -DWITH_QT5SERIALPORT="$WITH_QT5SERIALPORT" \
   -DWITH_QTSERIALPORT="$WITH_QTSERIALPORT" \
+  -DWITH_QTWEBENGINE="$WITH_QTWEBENGINE" \
   -DWITH_QTWEBKIT="$WITH_QTWEBKIT" \
   -DWITH_QUICK="$WITH_QUICK" \
   -DWITH_QWTPOLAR="$WITH_QWTPOLAR" \
@@ -104,6 +109,22 @@ if [[ "$MODE" == "install" ]]; then
     cp -a /usr/lib/python3/dist-packages/qgis \
       /tmp/usr/lib/python3/dist-packages
   fi
+
+  # Install QGIS server landingpage
+  if [[ -d /var/cache/qgis-build/output/data/resources/server/api/ogc/static/landingpage ]]; then
+    if [[ ! -d "$PREFIX/share/qgis/resources/server/api/ogc/static/landingpage" ]]; then
+      mkdir -p "$PREFIX/share/qgis/resources/server/api/ogc/static"
+      cp -a /var/cache/qgis-build/output/data/resources/server/api/ogc/static/landingpage \
+        "$PREFIX/share/qgis/resources/server/api/ogc/static"
+    fi
+  fi
 else
   ninja "$MODE"
+
+  # Remove QGIS server landingpage
+  if [[ "$MODE" == "uninstall" ]]; then
+    if [[ -d "$PREFIX/share/qgis/resources/server/api/ogc/static/landingpage" ]]; then
+      rm -rf "$PREFIX/share/qgis/resources/server/api/ogc/static/landingpage"
+    fi
+  fi
 fi
