@@ -1,7 +1,7 @@
 ARG IMAGE
 ARG PREFIX=/usr/local
 
-FROM glcr.b-data.ch/nodejs/nsi/18.19.0/debian:11 as nsi
+FROM glcr.b-data.ch/nodejs/nsi/18.19.1/debian:11 as nsi
 
 FROM ${IMAGE} as builder
 
