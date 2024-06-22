@@ -1,7 +1,7 @@
 ARG IMAGE
 ARG PREFIX=/usr/local
 
-FROM glcr.b-data.ch/nodejs/nsi/18.19.1/debian:11 as nsi
+FROM glcr.b-data.ch/nodejs/nsi/18.20.3/debian:11 as nsi
 
 FROM ${IMAGE} as builder
 
@@ -194,7 +194,9 @@ RUN . /etc/os-release \
 
 RUN apt-get -y install \
     build-essential \
-    curl
+    curl \
+  ## Update ccache symlinks
+  && /usr/sbin/update-ccache-symlinks
 
 ## Clean up Node.js installation
 RUN bash -c 'rm -f /usr/local/bin/{docker-entrypoint.sh,yarn*}' \
