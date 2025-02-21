@@ -223,7 +223,8 @@ RUN if [ "$PREFIX" = "/usr/local" ]; then \
   fi
 
 ## Uninstall cmake
-RUN pip uninstall -y cmake
+RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
+  && pip uninstall -y cmake
 
 ## Remove outdated SAGA GIS provider
 RUN rm -rf "${PREFIX}/share/qgis/python/plugins/sagaprovider"
