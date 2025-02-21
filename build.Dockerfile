@@ -238,4 +238,3 @@ LABEL org.opencontainers.image.licenses="MIT" \
 ARG PREFIX
 
 COPY --from=builder ${PREFIX} ${PREFIX}
-COPY --from=builder /usr/lib/python3/dist-packages/qgis /usr/lib/python3/dist-packages/qgis
