@@ -78,8 +78,6 @@ RUN apt-get update \
     bison \
     ca-certificates \
     ccache \
-    cmake \
-    cmake-curses-gui \
     dh-python \
     doxygen \
     expect \
@@ -137,6 +135,7 @@ RUN apt-get update \
     python3-mock \
     python3-nose2 \
     python3-owslib \
+    python3-pip \
     python3-plotly \
     python3-psycopg2 \
     python3-pygments \
@@ -169,7 +168,8 @@ RUN apt-get update \
     xfonts-75dpi \
     xfonts-base \
     xfonts-scalable \
-    xvfb
+    xvfb \
+  && pip install cmake
 
 ## Install build dependencies (codename-dependent)
 RUN . /etc/os-release \
