@@ -169,6 +169,7 @@ RUN apt-get update \
     xfonts-base \
     xfonts-scalable \
     xvfb \
+  && export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && pip install cmake
 
 ## Install build dependencies (codename-dependent)
