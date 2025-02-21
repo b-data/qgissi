@@ -222,6 +222,9 @@ RUN if [ "$PREFIX" = "/usr/local" ]; then \
     rm -f /usr/local/share/systemtap/tapset/node.stp; \
   fi
 
+## Uninstall cmake
+RUN pip uninstall -y cmake
+
 ## Remove outdated SAGA GIS provider
 RUN rm -rf "${PREFIX}/share/qgis/python/plugins/sagaprovider"
 
