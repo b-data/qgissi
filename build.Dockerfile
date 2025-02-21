@@ -222,6 +222,9 @@ RUN if [ "$PREFIX" = "/usr/local" ]; then \
     rm -f /usr/local/share/systemtap/tapset/node.stp; \
   fi
 
+## Uninstall cmake
+RUN pip uninstall -y cmake
+
 ## Remove outdated SAGA GIS provider
 RUN rm -rf "${PREFIX}/share/qgis/python/plugins/sagaprovider"
 
@@ -235,4 +238,3 @@ LABEL org.opencontainers.image.licenses="MIT" \
 ARG PREFIX
 
 COPY --from=builder ${PREFIX} ${PREFIX}
-COPY --from=builder /usr/lib/python3/dist-packages/qgis /usr/lib/python3/dist-packages/qgis
