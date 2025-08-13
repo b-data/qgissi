@@ -1,9 +1,9 @@
 ARG IMAGE
 ARG PREFIX=/usr/local
 
-FROM glcr.b-data.ch/nodejs/nsi/18.20.7/debian:11 as nsi
+FROM glcr.b-data.ch/nodejs/nsi/18.20.7/debian:12 AS nsi
 
-FROM ${IMAGE} as builder
+FROM ${IMAGE} AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -52,6 +52,7 @@ ARG WITH_QT5SERIALPORT=TRUE
 ARG WITH_QTSERIALPORT=TRUE
 ARG WITH_QTWEBENGINE=FALSE
 ARG WITH_QTWEBKIT=TRUE
+## Use WITH_QTWEBKIT=FALSE for debian:13
 ARG WITH_QUICK=FALSE
 ARG WITH_QWTPOLAR=FALSE
 ARG WITH_SERVER=ON
@@ -104,7 +105,6 @@ RUN apt-get update \
     libqt5serialport5-dev \
     libqt5sql5-sqlite \
     libqt5svg5-dev \
-    libqt5webkit5-dev \
     libqt5xmlpatterns5-dev \
     libqwt-qt5-dev \
     libspatialindex-dev \
@@ -146,9 +146,7 @@ RUN apt-get update \
     python3-pyqt5.qtpositioning \
     python3-pyqt5.qtsql \
     python3-pyqt5.qtsvg \
-    python3-pyqt5.qtwebkit \
     python3-pyqt5.qtserialport \
-    python3-sip \
     python3-termcolor \
     python3-yaml \
     qt3d-assimpsceneimport-plugin \
@@ -174,6 +172,11 @@ RUN apt-get update \
 
 ## Install build dependencies (codename-dependent)
 RUN . /etc/os-release \
+  && if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|bookworm|focal|jammy|noble|oracular"; then \
+    apt-get -y install \
+      libqt5webkit5-dev \
+      python3-pyqt5.qtwebkit; \
+  fi \
   && if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|focal|jammy"; then \
     apt-get -y install \
       libpdal-dev \
@@ -189,7 +192,7 @@ RUN . /etc/os-release \
       qt5-default; \
     git -C /var/tmp clone --depth 1 https://github.com/qgis/QGIS; \
   fi \
-  && if echo "$VERSION_CODENAME" | grep -Eq "bookworm|sid|jammy|kinetic|lunar"; then \
+  && if echo "$VERSION_CODENAME" | grep -Eq "bookworm|trixie|sid|jammy|noble|oracular|plucky"; then \
     apt-get -y install \
       python3-pyqtbuild \
       qtkeychain-qt5-dev \
