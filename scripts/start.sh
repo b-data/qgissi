@@ -106,12 +106,15 @@ if [[ "$MODE" == "install" ]]; then
   mkdir -p "$PREFIX"
   ninja "$MODE"
 
+  # Move Python bindings to QGIS
+  test -d /usr/local/lib/python*/dist-packages/qgis \
+  && mv /usr/local/lib/python*/dist-packages/qgis \
+    /usr/lib/python3/dist-packages
+
   # Install Python bindings to QGIS
-  if [[ -d /usr/lib/python3/dist-packages/qgis ]]; then
-    mkdir -p /tmp/usr/lib/python3/dist-packages
-    cp -a /usr/lib/python3/dist-packages/qgis \
-      /tmp/usr/lib/python3/dist-packages
-  fi
+  mkdir -p /tmp/usr/lib/python3/dist-packages
+  cp -a /usr/lib/python3/dist-packages/qgis \
+    /tmp/usr/lib/python3/dist-packages
 
   # Install QGIS server landingpage
   if [[ -d /var/cache/qgis-build/output/data/resources/server/api/ogc/static/landingpage ]]; then
