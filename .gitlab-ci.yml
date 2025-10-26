@@ -32,6 +32,7 @@ build:latest-linux-amd64:
       docker build
       --build-arg IMAGE
       --build-arg QGIS_VERSION
+      --build-arg WITH_INTERNAL_SPATIALINDEX
       --build-arg WITH_QTWEBKIT
       -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-amd64
       -t $CI_APP_REPO/latest/$IMAGE-linux-amd64
@@ -52,6 +53,7 @@ build:latest-linux-arm64v8:
       docker build
       --build-arg IMAGE
       --build-arg QGIS_VERSION
+      --build-arg WITH_INTERNAL_SPATIALINDEX
       --build-arg WITH_QTWEBKIT
       -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
       -t $CI_APP_REPO/latest/$IMAGE-linux-arm64v8
@@ -72,6 +74,7 @@ build:ltr-linux-amd64:
       docker build
       --build-arg IMAGE
       --build-arg QGIS_VERSION
+      --build-arg WITH_INTERNAL_SPATIALINDEX
       --build-arg WITH_QTWEBKIT
       -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-amd64
       -t $CI_APP_REPO/ltr/$IMAGE-linux-amd64
@@ -92,6 +95,7 @@ build:ltr-linux-arm64v8:
       docker build
       --build-arg IMAGE
       --build-arg QGIS_VERSION
+      --build-arg WITH_INTERNAL_SPATIALINDEX
       --build-arg WITH_QTWEBKIT
       -t $CI_APP_REPO/$QGIS_VERSION/$IMAGE-linux-arm64v8
       -t $CI_APP_REPO/ltr/$IMAGE-linux-arm64v8
