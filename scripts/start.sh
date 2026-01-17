@@ -11,9 +11,13 @@ if [[ ! "$PREFIX" == "/usr/local" && ! "$PREFIX" =~ ^"/opt" ]]; then
 fi
 
 # Download and extract source code
-curl -sSL https://download.qgis.org/downloads/qgis-"$QGIS_VERSION".tar.bz2 \
-  -o "/tmp/qgis-$QGIS_VERSION.tar.bz2"
-tar xf "/tmp/qgis-$QGIS_VERSION.tar.bz2" --no-same-owner -C /tmp
+curl -sSL https://github.com/qgis/QGIS/archive/refs/tags/final-"${QGIS_VERSION//./_}".tar.gz \
+  -o "/tmp/qgis-$QGIS_VERSION.tar.gz"
+mkdir "/tmp/qgis-$QGIS_VERSION"
+tar xfz "/tmp/qgis-$QGIS_VERSION.tar.gz" \
+  --no-same-owner \
+  --strip-components=1 \
+  -C "/tmp/qgis-$QGIS_VERSION"
 
 CMAKE_EXTRA_ARGS=()
 
