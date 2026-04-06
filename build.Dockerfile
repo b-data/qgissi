@@ -25,6 +25,9 @@ ARG WITH_CUSTOM_WIDGETS=ON
 ARG WITH_DESKTOP=ON
 ARG WITH_DRACO=TRUE
 ARG WITH_EPT=TRUE
+ARG WITH_EXIV2=TRUE
+ARG WITH_GEOGRAPHICLIB=FALSE
+## Use WITH_GEOGRAPHICLIB=TRUE for debian:13 and ubuntu:24.04
 ARG WITH_GRASS7=ON
 ARG WITH_GRASS8=ON
 ARG WITH_GRASS_PLUGIN=TRUE
@@ -37,6 +40,7 @@ ARG WITH_INTERNAL_MESHOPTIMIZER=TRUE
 ARG WITH_INTERNAL_NLOHMANN_JSON=TRUE
 ARG WITH_INTERNAL_O2=ON
 ARG WITH_INTERNAL_POLY2TRI=TRUE
+ARG WITH_INTERNAL_QWT=FALSE
 ARG WITH_INTERNAL_SPATIALINDEX=FALSE
 ## Use WITH_INTERNAL_SPATIALINDEX=TRUE for debian:13
 ARG WITH_OAUTH2_PLUGIN=TRUE
@@ -51,6 +55,7 @@ ARG WITH_QGIS_PROCESS=TRUE
 ARG WITH_QSCIAPI=TRUE
 ARG WITH_QSPATIALITE=ON
 ARG WITH_QTGAMEPAD=FALSE
+ARG WITH_QTPOSITIONING=TRUE
 ARG WITH_QTPRINTER=TRUE
 ARG WITH_QT5SERIALPORT=TRUE
 ARG WITH_QTSERIALPORT=TRUE
@@ -63,6 +68,8 @@ ARG WITH_SERVER=ON
 ARG WITH_SERVER_LANDINGPAGE_WEBAPP=TRUE
 ARG WITH_SERVER_PLUGINS=ON
 ARG WITH_SPATIALITE=TRUE
+ARG WITH_SFCGAL=FALSE
+## Use WITH_SFCGAL=TRUE for debian:13
 ARG WITH_STAGED_PLUGINS=ON
 ARG WITH_THREAD_LOCAL=TRUE
 
@@ -77,7 +84,7 @@ ENV CC=/usr/lib/ccache/gcc \
 ## Install Node.js
 COPY --from=nsi /usr/local /usr/local
 
-## Install build dependencies (codename-independent)
+## Install build dependencies (common)
 RUN apt-get update \
   && apt-get -y install \
     bison \
@@ -102,15 +109,6 @@ RUN apt-get update \
     libpq-dev \
     libproj-dev \
     libprotobuf-dev \
-    libqca-qt5-2-dev \
-    libqca-qt5-2-plugins \
-    libqscintilla2-qt5-dev \
-    libqt5opengl5-dev \
-    libqt5serialport5-dev \
-    libqt5sql5-sqlite \
-    libqt5svg5-dev \
-    libqt5xmlpatterns5-dev \
-    libqwt-qt5-dev \
     libspatialindex-dev \
     libspatialite-dev \
     libsqlite3-dev \
@@ -127,9 +125,6 @@ RUN apt-get update \
     pkg-config \
     poppler-utils \
     protobuf-compiler \
-    pyqt5-dev \
-    pyqt5-dev-tools \
-    pyqt5.qsci-dev \
     python3-all-dev \
     python3-autopep8 \
     python3-dev \
@@ -144,26 +139,8 @@ RUN apt-get update \
     python3-psycopg2 \
     python3-pygments \
     python3-pyproj \
-    python3-pyqt5 \
-    python3-pyqt5.qsci \
-    python3-pyqt5.qtmultimedia \
-    python3-pyqt5.qtpositioning \
-    python3-pyqt5.qtsql \
-    python3-pyqt5.qtsvg \
-    python3-pyqt5.qtserialport \
     python3-termcolor \
     python3-yaml \
-    qt3d-assimpsceneimport-plugin \
-    qt3d-defaultgeometryloader-plugin \
-    qt3d-gltfsceneio-plugin \
-    qt3d-scene2d-plugin \
-    qt3d5-dev \
-    qtbase5-dev \
-    qtbase5-private-dev \
-    qtmultimedia5-dev \
-    qtpositioning5-dev \
-    qttools5-dev \
-    qttools5-dev-tools \
     spawn-fcgi \
     xauth \
     xfonts-100dpi \
@@ -174,33 +151,108 @@ RUN apt-get update \
   && export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && pip install cmake
 
-## Install build dependencies (codename-dependent)
+## Install build dependencies (QGIS version-dependent)
 RUN . /etc/os-release \
-  && if echo "$VERSION_CODENAME" | grep -Eq "bookworm|trixie|forky|sid|jammy|noble|plucky|questing|resolute"; then \
+  && QGIS_VERSION_MAJOR=${QGIS_VERSION%%.*} \
+  && if [ "$QGIS_VERSION_MAJOR" -lt "4" ]; then \
     apt-get -y install \
-      python3-pyqtbuild \
-      qtkeychain-qt5-dev \
-      sip-tools; \
-  fi \
-  && if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|bookworm|focal|jammy|noble"; then \
+      libqca-qt5-2-dev \
+      libqca-qt5-2-plugins \
+      libqscintilla2-qt5-dev \
+      libqt5opengl5-dev \
+      libqt5serialport5-dev \
+      libqt5sql5-sqlite \
+      libqt5svg5-dev \
+      libqt5xmlpatterns5-dev \
+      libqwt-qt5-dev \
+      pyqt5-dev \
+      pyqt5-dev-tools \
+      pyqt5.qsci-dev \
+      python3-pyqt5 \
+      python3-pyqt5.qsci \
+      python3-pyqt5.qtmultimedia \
+      python3-pyqt5.qtpositioning \
+      python3-pyqt5.qtsql \
+      python3-pyqt5.qtsvg \
+      python3-pyqt5.qtserialport \
+      qt3d-assimpsceneimport-plugin \
+      qt3d-defaultgeometryloader-plugin \
+      qt3d-gltfsceneio-plugin \
+      qt3d-scene2d-plugin \
+      qt3d5-dev \
+      qtbase5-dev \
+      qtbase5-private-dev \
+      qtmultimedia5-dev \
+      qtpositioning5-dev \
+      qttools5-dev \
+      qttools5-dev-tools; \
+    ## Install build dependencies (Linux codename-dependent)
+    if echo "$VERSION_CODENAME" | grep -Eq "bookworm|trixie|forky|sid|jammy|noble|plucky|questing|resolute"; then \
+      apt-get -y install \
+        python3-pyqtbuild \
+        qtkeychain-qt5-dev \
+        sip-tools; \
+    fi; \
+    if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|bookworm|focal|jammy|noble"; then \
+      apt-get -y install \
+        libqt5webkit5-dev \
+        python3-pyqt5.qtwebkit; \
+    fi; \
+    if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|focal|jammy"; then \
+      apt-get -y install \
+        libpdal-dev \
+        pdal; \
+    fi; \
+    if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|focal"; then \
+      apt-get -y install \
+        python3-sip-dev \
+        qt5keychain-dev; \
+    fi; \
+    if echo "$VERSION_CODENAME" | grep -Eq "buster|focal"; then \
+      apt-get -y install \
+        qt5-default; \
+    fi; \
+  else \
     apt-get -y install \
-      libqt5webkit5-dev \
-      python3-pyqt5.qtwebkit; \
-  fi \
-  && if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|focal|jammy"; then \
-    apt-get -y install \
-      libpdal-dev \
-      pdal; \
-  fi \
-  && if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|focal"; then \
-    apt-get -y install \
-      python3-sip-dev \
-      qt5keychain-dev; \
-  fi \
-  && if echo "$VERSION_CODENAME" | grep -Eq "buster|focal"; then \
-    apt-get -y install \
-      qt5-default; \
-    git -C /var/tmp clone --depth 1 https://github.com/qgis/QGIS; \
+      libcups2-dev \
+      libqca-qt6-dev \
+      libqca-qt6-plugins \
+      libqscintilla2-qt6-dev \
+      libqt6sql6-sqlite \
+      pyqt6-dev \
+      pyqt6-dev-tools \
+      pyqt6.qsci-dev \
+      python3-pyqt6 \
+      python3-pyqt6.qsci \
+      python3-pyqt6.qtmultimedia \
+      python3-pyqt6.qtpositioning \
+      python3-pyqt6.qtserialport \
+      python3-pyqt6.qtsvg \
+      python3-pyqt6.sip \
+      qt6-3d-assimpsceneimport-plugin \
+      qt6-3d-defaultgeometryloader-plugin \
+      qt6-3d-dev \
+      qt6-3d-gltfsceneio-plugin \
+      qt6-3d-scene2d-plugin \
+      qt6-5compat-dev \
+      qt6-base-dev \
+      qt6-base-private-dev\
+      qt6-multimedia-dev \
+      qt6-positioning-dev \
+      qt6-serialport-dev \
+      qt6-svg-dev \
+      qt6-tools-dev \
+      qt6-tools-dev-tools \
+      qt6-webengine-dev; \
+    ## Install build dependencies (Linux codename-dependent)
+    if echo "$VERSION_CODENAME" | grep -Eq "trixie|forky|sid|plucky|questing|resolute"; then \
+      apt-get -y install \
+        libgeographiclib-dev \
+        libsfcgal-dev \
+        python3-pyqtbuild \
+        qtkeychain-qt6-dev \
+        sip-tools; \
+    fi; \
   fi
 
 RUN apt-get -y install \
