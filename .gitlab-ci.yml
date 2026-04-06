@@ -32,6 +32,7 @@ build:latest-linux-amd64:
       docker build
       --build-arg IMAGE
       --build-arg QGIS_VERSION
+      --build-arg PDAL_VERSION
       --build-arg WITH_GEOGRAPHICLIB
       --build-arg WITH_INTERNAL_SPATIALINDEX
       --build-arg WITH_SFCGAL
@@ -55,6 +56,7 @@ build:latest-linux-arm64v8:
       docker build
       --build-arg IMAGE
       --build-arg QGIS_VERSION
+      --build-arg PDAL_VERSION
       --build-arg WITH_GEOGRAPHICLIB
       --build-arg WITH_INTERNAL_SPATIALINDEX
       --build-arg WITH_SFCGAL
@@ -78,6 +80,7 @@ build:ltr-linux-amd64:
       docker build
       --build-arg IMAGE
       --build-arg QGIS_VERSION
+      --build-arg PDAL_VERSION
       --build-arg WITH_GEOGRAPHICLIB
       --build-arg WITH_INTERNAL_SPATIALINDEX
       --build-arg WITH_SFCGAL
@@ -101,6 +104,7 @@ build:ltr-linux-arm64v8:
       docker build
       --build-arg IMAGE
       --build-arg QGIS_VERSION
+      --build-arg PDAL_VERSION
       --build-arg WITH_GEOGRAPHICLIB
       --build-arg WITH_INTERNAL_SPATIALINDEX
       --build-arg WITH_SFCGAL
