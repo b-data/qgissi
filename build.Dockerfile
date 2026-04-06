@@ -8,6 +8,7 @@ FROM ${IMAGE} AS builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG QGIS_VERSION
+ARG PDAL_VERSION
 
 ARG WITH_3D=ON
 ARG WITH_ANALYSIS=TRUE
@@ -40,7 +41,8 @@ ARG WITH_INTERNAL_SPATIALINDEX=FALSE
 ## Use WITH_INTERNAL_SPATIALINDEX=TRUE for debian:13
 ARG WITH_OAUTH2_PLUGIN=TRUE
 ARG WITH_ORACLE=FALSE
-ARG WITH_PDAL=FALSE
+ARG WITH_PDAL=${PDAL_VERSION:+TRUE}
+ARG WITH_PDAL=${WITH_PDAL:-FALSE}
 ARG WITH_PDF4QT=FALSE
 ARG WITH_POSTGRESQL=TRUE
 ARG WITH_PYTHON=ON
@@ -174,7 +176,13 @@ RUN apt-get update \
 
 ## Install build dependencies (codename-dependent)
 RUN . /etc/os-release \
-  && if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|bookworm|focal|jammy|noble|oracular"; then \
+  && if echo "$VERSION_CODENAME" | grep -Eq "bookworm|trixie|forky|sid|jammy|noble|plucky|questing|resolute"; then \
+    apt-get -y install \
+      python3-pyqtbuild \
+      qtkeychain-qt5-dev \
+      sip-tools; \
+  fi \
+  && if echo "$VERSION_CODENAME" | grep -Eq "buster|bullseye|bookworm|focal|jammy|noble"; then \
     apt-get -y install \
       libqt5webkit5-dev \
       python3-pyqt5.qtwebkit; \
@@ -193,12 +201,6 @@ RUN . /etc/os-release \
     apt-get -y install \
       qt5-default; \
     git -C /var/tmp clone --depth 1 https://github.com/qgis/QGIS; \
-  fi \
-  && if echo "$VERSION_CODENAME" | grep -Eq "bookworm|trixie|sid|jammy|noble|oracular|plucky"; then \
-    apt-get -y install \
-      python3-pyqtbuild \
-      qtkeychain-qt5-dev \
-      sip-tools; \
   fi
 
 RUN apt-get -y install \
@@ -213,7 +215,11 @@ RUN bash -c 'rm -f /usr/local/bin/{docker-entrypoint.sh,yarn*}' \
   ## Enable corepack (Yarn, pnpm)
   && corepack enable
 
-COPY scripts/start.sh /usr/bin/
+COPY scripts/*.sh /usr/bin/
+
+WORKDIR /var/cache/pdal-build
+
+RUN install-pdal.sh
 
 WORKDIR /var/cache/qgis-build
 
