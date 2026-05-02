@@ -118,7 +118,7 @@ if [[ "$MODE" == "install" ]]; then
 
   # Move Python bindings to QGIS
   test -d /usr/local/lib/python*/dist-packages/qgis \
-  && mv /usr/local/lib/python*/dist-packages/qgis \
+  && mv /usr/local/lib/python*/dist-packages/qgis* \
     /usr/lib/python3/dist-packages
 
   # Install Python bindings to QGIS
