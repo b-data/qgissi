@@ -71,7 +71,11 @@ ARG WITH_SPATIALITE=TRUE
 ARG WITH_SFCGAL=FALSE
 ## Use WITH_SFCGAL=TRUE for debian:13
 ARG WITH_STAGED_PLUGINS=ON
+ARG WITH_TBB=FALSE
 ARG WITH_THREAD_LOCAL=TRUE
+ARG WITH_TRACY=FALSE
+ARG WITH_VCPKG=FALSE
+ARG WITH_WAYLAND=TRUE
 
 ARG PREFIX
 ARG MODE=install
@@ -229,11 +233,7 @@ RUN . /etc/os-release \
       python3-pyqt6.qtserialport \
       python3-pyqt6.qtsvg \
       python3-pyqt6.sip \
-      qt6-3d-assimpsceneimport-plugin \
-      qt6-3d-defaultgeometryloader-plugin \
       qt6-3d-dev \
-      qt6-3d-gltfsceneio-plugin \
-      qt6-3d-scene2d-plugin \
       qt6-5compat-dev \
       qt6-base-dev \
       qt6-base-private-dev\
@@ -244,6 +244,30 @@ RUN . /etc/os-release \
       qt6-tools-dev \
       qt6-tools-dev-tools \
       qt6-webengine-dev; \
+    ## Install build dependencies (QGIS version-dependent)
+    QGIS_VERSION_MAJOR_MINOR=${QGIS_VERSION%.*}; \
+    if [ "$QGIS_VERSION_MAJOR_MINOR" -lt "4.4" ]; then \
+      apt-get -y install \
+        qt6-3d-assimpsceneimport-plugin \
+        qt6-3d-defaultgeometryloader-plugin \
+        qt6-3d-gltfsceneio-plugin \
+        qt6-3d-scene2d-plugin; \
+    else \
+      apt-get -y install \
+        libfontconfig-dev \
+        libjpeg*-turbo*-dev \
+        liblcms2-dev \
+        libopenjp2-7-dev \
+        libopenjp2-tools \
+        libopenjpip-dec-server \
+        libopenjpip7 \
+        libpng-dev \
+        libssl-dev \
+        libtbb-dev \
+        qt6-wayland-dev \
+        wayland-protocols \
+        zlib1g-dev; \
+    fi; \
     ## Install build dependencies (Linux codename-dependent)
     if echo "$VERSION_CODENAME" | grep -Eq "trixie|forky|sid|plucky|questing|resolute"; then \
       apt-get -y install \
